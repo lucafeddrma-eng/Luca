@@ -1,0 +1,85 @@
+:root {
+  --bg-main: #0b0f19;
+  --bg-card: #121826;
+  --bg-card-border: #1e293b;
+  --primary-orange: #ff6b2b;
+  --primary-orange-hover: #e0551b;
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --radius-card: 16px;
+}
+
+body {
+  background-color: var(--bg-main) !important;
+  color: var(--text-main) !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.card, .bg-secondary, .paymenter-card {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--bg-card-border) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4) !important;
+}
+
+.btn-primary, button[type="submit"], .bg-orange-600 {
+  background-color: var(--primary-orange) !important;
+  border-color: var(--primary-orange) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover, button[type="submit"]:hover {
+  background-color: var(--primary-orange-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline, .btn-secondary {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--bg-card-border) !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+}
+
+.badge-orange, .text-orange {
+  color: var(--primary-orange) !important;
+}
+
+.badge-discount {
+  background-color: var(--primary-orange) !important;
+  color: #fff !important;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.discount-banner {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 450px;
+  background-color: #151c2e;
+  border: 1px solid rgba(255, 107, 43, 0.3);
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 9999;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.discount-banner .btn-copy {
+  background-color: var(--primary-orange);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
