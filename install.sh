@@ -1,0 +1,69 @@
+#!/bin/bash
+
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+PAYMENTER_DIR="/var/www/paymenter"
+RAW_CSS_URL="https://raw.githubusercontent.com/lucafeddrma-eng/Luca/main/theme.css"
+
+echo -e "${GREEN}==> Starten van de CraftNode theme installatie...${NC}"
+
+if [ ! -d "$PAYMENTER_DIR" ]; then
+    echo -e "${RED}Fout: Paymenter map niet gevonden op $PAYMENTER_DIR!${NC}"
+    exit 1
+fi
+
+cd $PAYMENTER_DIR || exit
+
+echo -e "${GREEN}==> Theme CSS downloaden van GitHub...${NC}"
+curl -s -o public/craftnode.css $RAW_CSS_URL
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Fout tijdens het downloaden van theme.css.${NC}"
+    exit 1
+fi
+
+# Zoek automatisch het juiste layout-bestand
+LAYOUT_FILE=""
+POSSIBLE_FILES=(
+    "resources/views/layouts/app.blade.php"
+    "resources/views/default/layouts/app.blade.php"
+    "resources/views/layouts/admin.blade.php"
+)
+
+for file in "${POSSIBLE_FILES[@]}"; do
+    if [ -f "$file" ]; then
+        LAYOUT_FILE="$file"
+        break
+    fi
+done
+
+# Als het bestand niet via de bekende paden is gevonden, zoek dan op het hele systeem binnen Paymenter
+if [ -z "$LAYOUT_FILE" ]; then
+    LAYOUT_FILE=$(find resources/views -name "app.blade.php" | head -n 1)
+fi
+
+if [ -n "$LAYOUT_FILE" ] && [ -f "$LAYOUT_FILE" ]; then
+    echo -e "${GREEN}==> Layout bestand gevonden: $LAYOUT_FILE${NC}"
+
+    if ! grep -q "craftnode.css" "$LAYOUT_FILE"; then
+        echo -e "${GREEN}==> CSS koppelen in layout...${NC}"
+        sed -i '/<\/head>/i \    <link rel="stylesheet" href="{{ asset('\''craftnode.css'\'') }}">' "$LAYOUT_FILE"
+    fi
+
+    if ! grep -q "promo-banner" "$LAYOUT_FILE"; then
+        echo -e "${GREEN}==> Floating discount banner toevoegen...${NC}"
+        BANNER_HTML='<div class="discount-banner" id="promo-banner"><div class="flex items-center space-x-3"><span class="text-2xl">&#127873;</span><div><div class="text-[#ff6b2b] text-xs font-bold uppercase">Welcome discount</div><div class="text-white text-sm font-semibold">Use code <span class="text-[#ff6b2b]">CRAFT10</span></div></div></div><div class="flex items-center space-x-2"><button onclick="navigator.clipboard.writeText(\x27CRAFT10\x27)" class="btn-copy">Copy</button><button onclick="document.getElementById(\x27promo-banner\x27).style.display=\x27none\x27" class="text-gray-400 hover:text-white px-1">&#10005;</button></div></div>'
+        sed -i "/<\/body>/i \\    $BANNER_HTML" "$LAYOUT_FILE"
+    fi
+else
+    echo -e "${RED}Let op: Geen geschikt layout-bestand (app.blade.php) gevonden.${NC}"
+fi
+
+echo -e "${GREEN}==> Rechten instellen en cache opschonen...${NC}"
+chown -R www-data:www-data $PAYMENTER_DIR/public/craftnode.css
+php artisan view:clear
+php artisan cache:clear
+
+echo -e "${GREEN}==> Thema succesvol geïnstalleerd! Herlaad je pagina met Ctrl+F5.${NC}"
